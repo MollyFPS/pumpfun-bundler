@@ -1,0 +1,76 @@
+[
+  {
+    "publicKey": "G1iXPsgyb42mkT95MAj8yFRbQ91jWEjvbUxLFnXRFwWq",
+    "privateKey": "5rBHmq2pqJQUncUecy7EDfmDucSpe3kParVWgH73tBfMF3DYkn8AafctBwfYjAhWepYzEEjcL633cZeoSapcHFQD",
+    "type": "funding",
+    "createdAt": "2024-11-27T23:34:48.139Z"
+  },
+  {
+    "publicKey": "4Z2Lmz3MpZEtSQZyPPJdXoGEhc5dT3RZKuFZBQCyfcVe",
+    "privateKey": "5H8MuQYDhXtCY18sXavwHjgxjonwSLH2WB9dKvGcy1atVn82TTQxVBt6ACoEoq4fymXq1zePoQbYFeQhJ9pvakqv",
+    "type": "funding",
+    "createdAt": "2024-11-27T23:34:48.139Z"
+  },
+  {
+    "publicKey": "HwW3n8h12DTcSRVwLeymLa7wT85St2ruJamYKWtUBxRs",
+    "privateKey": "hiCW4afzBnk5XMB94rkCHqWrERfrT7maZJ8zBmbwoEgeStj66ZjHBhy97xtMXJciYe84tyeMqfhTP9AjzwfinMT",
+    "type": "funding",
+    "createdAt": "2024-11-27T23:34:48.140Z"
+  },
+  {
+    "publicKey": "5hNq4XjZqJfswd9h6onKnZsJ4ZCAZ42i7xMvDCcpD6sB",
+    "privateKey": "4Ve9zhdGXoEn3CdFocst8WrKFaMg1znkx8vQZwUhuy3SUvGcQ9iGPJZpgHVHRUJJYqN8Ey9GqVRNK8hENmWNacLq",
+    "type": "funding",
+    "createdAt": "2024-11-27T23:34:48.141Z"
+  },
+  {
+    "publicKey": "Da5Z2ihGhKSrjEguHHkmzZLJcHfpRUifg3GNQdLYSB6J",
+    "privateKey": "5erGtWjSvpTgGbwjr52z4iXJcxRBfQqPiTfMb5a2aLAFFrbidBS99JxnQYApLZ2KKHujK7bpWkr6Qt3BjpsMkTUN",
+    "type": "funding",
+    "createdAt": "2024-11-27T23:34:48.141Z"
+  },
+  {
+    "publicKey": "5TTynzPndoBfRiMWMi2fSZEtt3TGjosYKnS5V4PCFL2H",
+    "privateKey": "67ZU6Wzq2aabviaXymhYA6i6CNMiw4ffqWZ9eAs5Q2Ktbaarh59w3GGQF9YmFETapHF2nP1c5EyFZkGUUaq7drjo",
+    "type": "micro_trade",
+    "purpose": "",
+    "createdAt": "2024-11-27T23:36:32.643Z"
+  },
+  {
+    "publicKey": "D84cYXkpnAG9MH66vkRQ7RTBPuyciZgo129zFeZp9RMs",
+    "privateKey": "5gmfni2THxGtvftRodD8duzyt7sVZCmmwcCdfy2qWwcSAPx4vonTVddyASTkfQfGr5371fDr9Z1Epm5C32bHqKcM",
+    "type": "volume_bot",
+    "purpose": "",
+    "createdAt": "2024-11-27T23:36:35.508Z"
+  },
+  {
+    "publicKey": "5rRMSbQUrQQ9hETyGgfmcG275GCZnaYgE8nWHm3aje1C",
+    "privateKey": "3gw1JEmT8gptdZfz8PHhkVvZk4CU424ir6S8RqoNjyvs2BtdNEHCNfNCohptAhEL9rysafXRzhq1LTKioyJMzU3Q",
+    "type": "funding",
+    "createdAt": "2024-11-27T23:36:57.574Z"
+  },
+  {
+    "publicKey": "7bNYX2Gn4ho1z6S2KUbySeXf9ugeWpcbigu3n2r1a1T7",
+    "privateKey": "Agtjyi43kPBHHB2W34RTZpk5itQ7UzJTRjcAwWocK1BU72pQEyWv3Q1VHwGFhm99CQLsLmuntiXwkArPubwZjNh",
+    "type": "funding",
+    "createdAt": "2024-11-27T23:36:57.575Z"
+  },
+  {
+    "publicKey": "3GV82UbckrS4ezu58J5a8TEVUcCHAVzUA4EM2owZrfET",
+    "privateKey": "4buoAsjWcCmJLwiwY7Y828TZxQUBsesyu1z2niwdurtPmpzwg3eEdRktM58HHGapQwh3TXAFZqNskFCWDHWTBLpj",
+    "type": "funding",
+    "createdAt": "2024-11-27T23:36:57.575Z"
+  },
+  {
+    "publicKey": "C1XRN2VqZFkGD59yW5hjZ5ktmhvp4ee24Bec6MoeEfc9",
+    "privateKey": "5mdgYMXEmhdTbkvk5XJKHZhcX2pSxp1PC37i6bGhyw6GYyLJJVD9N7xDrdKKFr955EzuVytJZkBMdcmcyeFL2RPs",
+    "type": "funding",
+    "createdAt": "2024-11-27T23:36:57.577Z"
+  },
+  {
+    "publicKey": "6PJU5qV6HwkrandYQe4gZE6pRudYgMx8MFpp6EVF4iDu",
+    "privateKey": "2g6zznSSqP8yUrPzsVKNnqWSj9ScJL1oAeJRyZmsQckFTFKauVte74UqsXKadkhm1gp2AZnJDjKiWLgCPd6RYyTD",
+    "type": "funding",
+    "createdAt": "2024-11-27T23:36:57.578Z"
+  }
+]

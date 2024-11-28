@@ -1,95 +1,97 @@
 import { Keypair } from '@solana/web3.js';
 import fs from 'fs';
 import path from 'path';
-import bs58 from 'bs58'; 
+import bs58 from 'bs58';
 import chalk from 'chalk';
 
-async function backupWallets(dirPath, devWalletPath, walletsFilePath) {
-    const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
-    const backupDir = path.join('src', 'backupWallets', `dev&buyers_backup_${timestamp}`);
-    if (!fs.existsSync(backupDir)) {
-        fs.mkdirSync(backupDir, { recursive: true });
+async function backupWallets(dirPath) {
+    if (!fs.existsSync(dirPath)) {
+        return; // Nothing to backup if directory doesn't exist
     }
 
-    const files = fs.readdirSync(dirPath).filter(file => file.endsWith('.json'));
-
-    files.forEach(file => {
-        const oldPath = path.join(dirPath, file);
-        const newPath = path.join(backupDir, file);
-        fs.renameSync(oldPath, newPath);
-    });
-
-    if (fs.existsSync(devWalletPath)) {
-        const devWalletBackupPath = path.join(backupDir, path.basename(devWalletPath));
-        fs.renameSync(devWalletPath, devWalletBackupPath);
-        console.log(chalk.green('Dev wallet has been backed up successfully.'));
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupDir = path.join('backups', `wallets_${timestamp}`);
+    
+    if (!fs.existsSync('backups')) {
+        fs.mkdirSync('backups', { recursive: true });
     }
+    
+    fs.mkdirSync(backupDir, { recursive: true });
 
-    if (fs.existsSync(walletsFilePath)) {
-        const walletsBackupPath = path.join(backupDir, path.basename(walletsFilePath));
-        fs.renameSync(walletsFilePath, walletsBackupPath);
-        console.log(chalk.green('Wallets.json has been backed up successfully.'));
+    const files = fs.readdirSync(dirPath);
+    for (const file of files) {
+        const srcPath = path.join(dirPath, file);
+        const destPath = path.join(backupDir, file);
+        fs.copyFileSync(srcPath, destPath);
     }
-
-    console.log(chalk.green('All existing wallets have been backed up successfully.'));
 }
 
-async function genWallet(amount) {
-    const configPath = './config.json';
-    if (!fs.existsSync(configPath)) {
-        console.error(chalk.red(`Config file ${configPath} does not exist.`));
-        return;
-    }
+export async function generateWallets(count = 5) {
+    try {
+        // Load config
+        const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+        const walletDir = config.WALLET_BUYERS_FOLDER;
 
-    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    const buyersFolder = config.WALLET_BUYERS_FOLDER;
-    const devWalletPath = config.SECRET_KEY_PATH;
-    const walletsFilePath = path.join('./walletsList.json');
-
-    // Check if amount exceeds 20
-    if (amount > 20) {
-        console.warn(chalk.yellow('Maximum amount of wallets is 20. Resetting amount to 20.'));
-        amount = 20;
-    }
-
-    // Backup existing wallets and dev wallet
-    await backupWallets(buyersFolder, devWalletPath, walletsFilePath);
-
-    const walletsData = [];
-
-    for (let i = 0; i < amount; i++) {
-        const keyPair = Keypair.generate();
-        const walletData = {
-            [`Wallet ${i + 1}`]: {
-                address: keyPair.publicKey.toBase58(),
-                privateKey: bs58.encode(keyPair.secretKey)
-            }
-        };
-
-        walletsData.push(walletData);
-
-        // Save to keypairs directory
-        fs.writeFileSync(path.join(buyersFolder, `wallet${i + 1}.json`), JSON.stringify(Array.from(keyPair.secretKey)));
-
-        console.log(chalk.green(`Wallet ${i + 1} generated.`));
-    }
-
-    // Generate a new dev wallet
-    const devWallet = Keypair.generate();
-    const devWalletData = {
-        'Dev Wallet': {
-            address: devWallet.publicKey.toBase58(),
-            privateKey: bs58.encode(devWallet.secretKey)
+        // Validate count
+        if (count < 1 || count > 20) {
+            throw new Error('Number of wallets must be between 1 and 20');
         }
-    };
 
-    walletsData.push(devWalletData);
-    fs.writeFileSync(devWalletPath, JSON.stringify(Array.from(devWallet.secretKey)));
-    console.log(chalk.green('Dev wallet generated.'));
+        // Create all necessary directories
+        const baseDir = path.dirname(walletDir);
+        const devWalletDir = path.dirname(config.SECRET_KEY_PATH);
 
-    // Save all wallet data to wallets.json
-    fs.writeFileSync(walletsFilePath, JSON.stringify(walletsData, null, 2));
-    console.log(chalk.green('All wallets generated successfully.'));
+        fs.mkdirSync(baseDir, { recursive: true });
+        fs.mkdirSync(walletDir, { recursive: true });
+        fs.mkdirSync(devWalletDir, { recursive: true });
+
+        // Backup existing wallets
+        await backupWallets(walletDir);
+
+        const generatedWallets = [];
+
+        // Generate new wallets
+        for (let i = 1; i <= count; i++) {
+            const wallet = Keypair.generate();
+            const walletData = {
+                publicKey: wallet.publicKey.toString(),
+                privateKey: bs58.encode(wallet.secretKey)
+            };
+
+            // Save wallet to file
+            const walletPath = path.join(walletDir, `wallet${i}.json`);
+            fs.writeFileSync(
+                walletPath,
+                JSON.stringify(Array.from(wallet.secretKey), null, 2)
+            );
+
+            // Also save to stored_wallets.json
+            const storedWalletsPath = 'stored_wallets.json';
+            let storedWallets = [];
+            
+            if (fs.existsSync(storedWalletsPath)) {
+                storedWallets = JSON.parse(fs.readFileSync(storedWalletsPath, 'utf8'));
+            }
+
+            storedWallets.push({
+                publicKey: wallet.publicKey.toString(),
+                privateKey: bs58.encode(wallet.secretKey),
+                type: 'sub',
+                createdAt: new Date().toISOString()
+            });
+
+            fs.writeFileSync(storedWalletsPath, JSON.stringify(storedWallets, null, 2));
+
+            generatedWallets.push(walletData);
+            console.log(chalk.green(`Generated wallet ${i}/${count}`));
+        }
+
+        console.log(chalk.green(`Successfully generated ${count} wallets`));
+        return generatedWallets;
+    } catch (error) {
+        console.error(chalk.red('Error generating wallets:', error));
+        throw error;
+    }
 }
 
-export default genWallet;
+export default generateWallets;

@@ -167,11 +167,27 @@ async function distro(amounts, devWalletAmount) {
         bund.addTransactions(tipTransaction);
 
         console.log("\nNumber of transactions in the bundle:", bund.transactions.length);
-        const sentBundle = await search.sendBundle(bund);
-
-        console.log("Sent Bundle: ", sentBundle);
+        try {
+            const sentBundle = await sendBundleWithRetry(search, bund);
+            console.log("Sent Bundle: ", sentBundle);
+        } catch (error) {
+            console.error("Failed to send bundle:", error);
+        }
         console.log(`Confirm Bundle Manually (JITO): https://explorer.jito.wtf/bundle/${sentBundle}`);
         console.log("\n");
+    }
+}
+
+async function sendBundleWithRetry(search, bundle, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            const sentBundle = await search.sendBundle(bundle);
+            return sentBundle;
+        } catch (error) {
+            if (i === maxRetries - 1) throw error;
+            console.log(`Retry ${i + 1}/${maxRetries} after error:`, error.message);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
     }
 }
 

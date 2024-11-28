@@ -4,6 +4,23 @@ import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
 import bs58 from 'bs58';
+import loadConfig from './loadConfig.js';
+
+async function createConnection(config) {
+    try {
+        const connection = new Connection(config.RPC_URL, {
+            commitment: 'confirmed',
+            wsEndpoint: config.WS_URL
+        });
+        
+        // Test the connection
+        await connection.getLatestBlockhash();
+        return connection;
+    } catch (error) {
+        console.error(chalk.red(`Failed to connect to RPC: ${error.message}`));
+        throw error;
+    }
+}
 
 async function loadWallets() {
     const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
@@ -119,34 +136,67 @@ async function checkBalancesDetailed() {
 }
 
 async function checkBalances() {
-	console.log(chalk.greenBright(`Fetching Balances ⌛️`));
-    const configPath = './config.json';
-    if (!fs.existsSync(configPath)) {
-        console.error(chalk.red(`Config file ${configPath} does not exist.`));
-        return 0; // Return 0 balance if config file is missing
-    }
-    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    const rpc = config.RPC_URL;
-    const ws = config.WS_URL;
+    try {
+        console.log(chalk.greenBright(`Fetching Balances ⌛️`));
+        const config = await loadConfig();
+        const connection = await createConnection(config);
+        const wallets = await loadWallets();
 
-    const connection = new Connection(rpc, {
-        commitment: 'confirmed',
-        wsEndpoint: ws
+        let totalBalance = 0;
+
+        for (const wallet of wallets) {
+            try {
+                const walletPublicKey = new PublicKey(wallet.pubKey);
+                const balance = await connection.getBalance(walletPublicKey);
+                totalBalance += (balance / 1e9);
+            } catch (error) {
+                console.error(chalk.yellow(`Failed to get balance for wallet ${wallet.label}: ${error.message}`));
+            }
+        }
+
+        return totalBalance.toFixed(4);
+    } catch (error) {
+        console.error(chalk.red(`Failed to check balances: ${error.message}`));
+        return "0.0000";
+    }
+}
+
+// Add connection retry logic and timeout
+async function getConnectionWithRetry(rpc, ws, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            const connection = new Connection(rpc, {
+                commitment: 'confirmed',
+                wsEndpoint: ws,
+                timeout: 30000
+            });
+            await connection.getLatestBlockhash(); // Test connection
+            return connection;
+        } catch (error) {
+            if (i === maxRetries - 1) throw error;
+            console.log(`Retry ${i + 1}/${maxRetries} connecting to RPC`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+}
+
+// Add cache for token balances
+const tokenBalanceCache = new Map();
+const CACHE_TTL = 30000; // 30 seconds
+
+async function fetchTokenBalanceWithCache(connection, wallet) {
+    const cacheKey = wallet.pubKey;
+    const cached = tokenBalanceCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        return cached.balance;
+    }
+    
+    const balance = await fetchTokens(wallet.pubKey);
+    tokenBalanceCache.set(cacheKey, {
+        balance,
+        timestamp: Date.now()
     });
-
-    const wallets = await loadWallets();
-
-    let totalBalance = 0;
-
-    for (let i = 0; i < wallets.length; i++) {
-        const wallet = wallets[i];
-        const walletPublicKey = new PublicKey(wallet.pubKey);
-
-        const balance = await connection.getBalance(walletPublicKey);
-        totalBalance += (balance / 1e9);
-    }
-
-    return totalBalance.toFixed(4); // Return the total balance
+    return balance;
 }
 
 export { checkBalancesDetailed, checkBalances };

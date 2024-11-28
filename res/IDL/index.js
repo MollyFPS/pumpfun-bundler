@@ -1,8 +1,13 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.IDL = void 0;
-var pump_fun_json_1 = require("./pump-fun.json");
-Object.defineProperty(exports, "IDL", { enumerable: true, get: function () { return __importDefault(pump_fun_json_1).default; } });
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const pumpFunJson = JSON.parse(
+    readFileSync(join(__dirname, './pump-fun.json'), 'utf8')
+);
+
+export const IDL = pumpFunJson;

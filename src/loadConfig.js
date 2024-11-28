@@ -1,22 +1,37 @@
 import fs from 'fs';
+import chalk from 'chalk';
 
 async function loadConfig() {
-    const rawConfig = fs.readFileSync("./config.json", "utf8");
-    const parsedConfig = JSON.parse(rawConfig);
+    const configPath = './config.json';
+    try {
+        if (!fs.existsSync(configPath)) {
+            throw new Error(`Config file not found at ${configPath}`);
+        }
 
-    let minBuySol = parsedConfig.minBuySol;
-    let maxBuySol = parsedConfig.maxBuySol;
-    let devBuySol = parsedConfig.devBuySol;
+        const rawConfig = fs.readFileSync(configPath, "utf8");
+        const config = JSON.parse(rawConfig);
 
-    minBuySol = parsedConfig.minBuySol.includes('.') ? parseFloat(parsedConfig.minBuySol) : parseInt(parsedConfig.minBuySol, 10);
-    maxBuySol = parsedConfig.maxBuySol.includes('.') ? parseFloat(parsedConfig.maxBuySol) : parseInt(parsedConfig.maxBuySol, 10);
-    devBuySol = parsedConfig.devBuySol.includes('.') ? parseFloat(parsedConfig.devBuySol) : parseInt(parsedConfig.devBuySol, 10);
+        // Validate required fields
+        const requiredFields = [
+            'RPC_URL', 
+            'WS_URL', 
+            'BLOCK_ENGINE_URL', 
+            'JITO_TIP_SECRET_KEY',
+            'WALLET_BUYERS_FOLDER',
+            'SECRET_KEY_PATH'
+        ];
 
-    return {
-        minBuySol,
-        maxBuySol,
-        devBuySol
-    };
+        for (const field of requiredFields) {
+            if (!config[field]) {
+                throw new Error(`Missing required config field: ${field}`);
+            }
+        }
+
+        return config;
+    } catch (error) {
+        console.error(chalk.red(`Config Error: ${error.message}`));
+        process.exit(1);
+    }
 }
 
 export default loadConfig;

@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "AndrewBundles",
   "type": "module",
-  "main": "main.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node main.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",

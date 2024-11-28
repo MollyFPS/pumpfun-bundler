@@ -2,10 +2,11 @@
   "name": "pf-volume",
   "version": "1.0.0",
   "description": "P.F Volume Bot",
-  "main": "main.js",
+  "type": "module",
+  "main": "index.js",
 
   "scripts": {
-    "start": "node main.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",

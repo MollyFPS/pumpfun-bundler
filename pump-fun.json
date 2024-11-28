@@ -1,0 +1,6 @@
+{
+  "MINT": "your_mint_address",
+  "BONDING_CURVE": "your_bonding_curve_address",
+  "A_BONDING_CURVE": "your_a_bonding_curve_address",
+  "PUMP": "your_pump_program_id"
+} 

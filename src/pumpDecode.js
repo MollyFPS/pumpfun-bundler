@@ -1,6 +1,9 @@
 import * as web3 from '@solana/web3.js';
 import { BondingCurveLayout } from './PUMP_LAYOUT.js';
 import fs from 'fs';
+import { PublicKey, SystemProgram, TransactionInstruction, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { PUMP_LAYOUT, INSTRUCTION_TYPES, ACCOUNT_INDEXES, PROGRAM_IDS, createInstructionData } from './PUMP_LAYOUT.js';
+import { getAssociatedTokenAddress } from '@solana/spl-token';
 
 async function GPA(bonding_curve) {
     const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
@@ -47,7 +50,53 @@ async function GPA(bonding_curve) {
         const errorMessage = `Error occurred: ${error.message || error}\n`;
         fs.appendFileSync(logFilePath, errorMessage);
         console.log("An error occurred, check logs.txt for more information.");
-        throw error; // Rethrow the error after logging it
+        throw error;
     }
 }
+
+export async function createBuyInstruction(connection, wallet, tokenMint, amount) {
+    try {
+        const mintPubkey = new PublicKey(tokenMint);
+        const owner = wallet.publicKey;
+
+        // Get bonding curve PDA
+        const [bondingCurve] = await PublicKey.findProgramAddressSync(
+            [Buffer.from('bonding-curve'), mintPubkey.toBuffer()],
+            new PublicKey(PROGRAM_IDS.PUMP_PROGRAM)
+        );
+
+        // Convert amount to lamports
+        const amountLamports = Math.floor(amount * LAMPORTS_PER_SOL);
+
+        // Create instruction data using the PUMP_LAYOUT
+        const instructionData = createInstructionData(
+            INSTRUCTION_TYPES.BUY,
+            BigInt(amountLamports),
+            BigInt(0) // minOutput set to 0
+        );
+
+        // Create the instruction
+        const ix = new TransactionInstruction({
+            programId: new PublicKey(PROGRAM_IDS.PUMP_PROGRAM),
+            keys: [
+                { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+                { pubkey: owner, isSigner: true, isWritable: true },
+                { pubkey: mintPubkey, isSigner: false, isWritable: true },
+                { pubkey: bondingCurve, isSigner: false, isWritable: true }
+            ],
+            data: instructionData
+        });
+
+        return ix;
+    } catch (error) {
+        console.error('Error creating buy instruction:', error);
+        throw error;
+    }
+}
+
+export async function createSellInstruction(connection, wallet, tokenMint, amount, minSolOutput) {
+    // Similar to createBuyInstruction but for selling
+    // Implement as needed
+}
+
 export default GPA;

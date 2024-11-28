@@ -1,17 +1,21 @@
 {
-  "RPC_URL": "",
-  "WS_URL": "",
-  "BLOCK_ENGINE_URL": "frankfurt.mainnet.block-engine.jito.wtf",
-  "JITO_TIP_PK": "96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5",
-  "JITO_TIP_SECRET_KEY": "",
-  "JITO_TIP_AMOUNT": 0.002,
-  "LOOKUP_TABLE_ADDRESS": "",
-  "DELAY": 1000,
-  "SECRET_KEY_PATH": "./dev_wallet.json",
-  "WALLET_BUYERS_FOLDER": "./src/walletBuyers",
-  "SENDER": "",
-  "maxBuySol": "",
-  "minBuySol": "",
-  "devBuySol": "",
-  "LICENSE_KEY": ""
+  "RPC_URLS": [
+    "https://api.testnet.solana.com",
+    "https://api.mainnet-beta.solana.com",
+    "https://solana-api.projectserum.com"
+  ],
+  "MAX_RETRIES": 5,
+  "RETRY_DELAY": 1000,
+  "CONNECTION_TIMEOUT": 30000,
+  "RPC_URL": "https://solana-api.projectserum.com",
+  "WS_URL": "wss://solana-api.projectserum.com",
+  "BLOCK_ENGINE_URL": "amsterdam.mainnet.block-engine.jito.wtf",
+  "WALLET_BUYERS_FOLDER": "./wallets/buyers",
+  "SECRET_KEY_PATH": "./wallets/dev/dev_wallet.json",
+  "JITO_TIP_SECRET_KEY": "your_jito_tip_secret_key",
+  "JITO_TIP_AMOUNT": 0.001,
+  "PROXIES": [
+    "http://username:password@proxy1.example.com:8080",
+    "http://username:password@proxy2.example.com:8080"
+  ]
 }
